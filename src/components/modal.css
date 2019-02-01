@@ -1,0 +1,28 @@
+.Modal {
+    background: rgba(0, 0, 0, 0.6);
+    height: 100%;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width:100%;
+}
+
+.Modal-body {
+    background: white;
+    height: 80vh;
+    left:50vw;
+    max-width: 500px;
+    overflow: auto;
+    position:fixed;
+    top:50vh;
+    transform: translate(-50%,-50%);
+    width: 80vw;
+}
+
+.Modal-display-block {
+    display: block;
+}
+
+.Modal-display-none {
+    display: none;
+}

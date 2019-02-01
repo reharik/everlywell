@@ -1,45 +1,81 @@
-import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import React, { Component } from 'react';
+import RecipeList from './../components/RecipeList';
 import { connect } from 'react-redux';
-import Layout from '../components/layout/Layout';
-import { getJsonSchema } from './../modules/schemaModule';
-import { checkAuth } from './../modules/authModule';
-import SignInContainer from './forms/SignInContainer';
+import { fetchRecipes } from './../redux/recipeList';
+import { setSpecials } from "../redux/specialsList";
+import { withRouter } from "react-router";
+import {random} from 'lodash';
+import {uniq} from 'lodash';
 
-class RecipesContainer extends Component {
+class RecipeListContainer extends Component {
+  state = {};
+
   componentDidMount() {
-    this.props.loadInitialData();
+    if(this.props.recipesLength === 0) {
+      this.props.fetchRecipes('a');
+    }
+  }
+
+  static getDerivedStateFromProps(props) {
+
+    if (props.recipesLength > 0
+      && props.specialsDate !== new Date().toDateString()) {
+      let specials = [];
+      while (specials.length !== 5) {
+        specials.push(random(0, props.recipesLength));
+        specials = uniq(specials);
+      }
+      props.setSpecials(specials);
+    }
+
+    return null;
   }
 
   render() {
-    return <Recipes />;
+    return <RecipeList {...this.props} />;
   }
 }
 
-RecipesContainer.propTypes = {
-  getJsonSchema: PropTypes.func,
-  fetchAllTrainersAction: PropTypes.func,
-  fetchAllClientsAction: PropTypes.func,
-  checkAuth: PropTypes.func,
+RecipeListContainer.propTypes = {
+  fetchRecipes: PropTypes.func,
   isFetching: PropTypes.bool,
   errorMessage: PropTypes.string,
-  isAuthenticated: PropTypes.bool,
+  recipes: PropTypes.array,
+  recipeId: PropTypes.string,
+  match: PropTypes.object,
+  history: PropTypes.object,
+  recipesLength: PropTypes.number,
+  specialsDate: PropTypes.string
 };
 
-function mapStateToProps(state = []) {
+function mapStateToProps(state = [], props) {
+  const recipeId = props.match.params.id;
+
+  let recipes = state.specialsList.specials
+    .map(specialId => state.recipeList.recipes[specialId])
+    .filter(Boolean)
+    .map(recipe => ({
+      id: recipe.idMeal,
+      name: recipe.strMeal
+    }));
+
   return {
-    isReady: Object.keys(state.schema.definitions).length > 0,
-    isAuthenticated: state.auth.isAuthenticated,
-    userName: state.auth.user.userName,
+    errorMessage: state.recipeList.errorMessage,
+    isFetching: state.recipeList.isFetching,
+    recipeId,
+    recipes,
+    recipesLength: state.recipeList.recipes.length,
+    specialsDate: state.specialsList.date
   };
 }
 
-export default connect(
+export default withRouter(connect(
   mapStateToProps,
   {
-    getJsonSchema,
-    checkAuth,
+    fetchRecipes,
+    setSpecials
   },
-)(RecipesContainer);
+)(RecipeListContainer));
 
 
