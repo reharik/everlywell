@@ -31,7 +31,7 @@ There are no tests.
 I don't have prettier setup on this computer so formatting
 could be a bit rough.
 
-### `Reasoning/Excuse`
+### `Reasoning`
 
 I spend a LOT of time on this despite all of the above.
 I had very little scaffolding for react/redux apps. While
